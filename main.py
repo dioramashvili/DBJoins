@@ -59,7 +59,6 @@ INSERT INTO Student(StudentID, StudentName, AdvisorID) VALUES
 # Commit changes to database
 conn.commit()
 
-# Add random data to the AdvisorStudent table
 num_students = 10
 num_advisors = 5
 students_assigned_to_advisor = 2
@@ -76,20 +75,16 @@ for _ in range(num_advisors):
         cursor.execute("INSERT INTO AdvisorStudent (AdvisorID, StudentID) VALUES (?, ?)", (advisor_id, student_id))
 conn.commit()
 
-# Print the advisors with their corresponding students
-cursor.execute("""SELECT Advisor.AdvisorName, Student.StudentName FROM Advisor
-                INNER JOIN AdvisorStudent ON Advisor.AdvisorID = AdvisorStudent.AdvisorID
-                INNER JOIN Student ON Student.StudentID = AdvisorStudent.StudentID""")
+cursor.execute("""SELECT Advisor.AdvisorName, COUNT(AdvisorStudent.StudentID) as StudentCount FROM Advisor
+                LEFT JOIN AdvisorStudent ON Advisor.AdvisorID = AdvisorStudent.AdvisorID
+                GROUP BY Advisor.AdvisorID""")
 
 results = cursor.fetchall()
 
-print("Advisor: Student")
+print("Advisor: Number of Students")
 for result in results:
     print(f"{result[0]}: {result[1]}")
 
-
-# Commit changes to database
 conn.commit()
 
-# Closing the connection
 conn.close()
